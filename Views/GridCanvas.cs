@@ -8,14 +8,13 @@ using GameOfLife.ViewModels;
 namespace GameOfLife.Views
 {
     /// <summary>
-    /// Niestandardowy element interfejsu (WPF FrameworkElement) służący do wydajnego renderowania
-    /// siatki gry przy użyciu DrawingVisual. Obsługuje rysowanie, zoom oraz różne topologie.
+    /// Renderowanie symulacji
     /// </summary>
     public class GridCanvas : FrameworkElement
     {
         private readonly VisualCollection _visuals;
-        private readonly DrawingVisual _backgroundVisual; // Warstwa siatki pomocniczej
-        private readonly DrawingVisual _cellsVisual;      // Warstwa żywych komórek
+        private readonly DrawingVisual _backgroundVisual; // siatka
+        private readonly DrawingVisual _cellsVisual;      // komorki
         private readonly Brush[] _cellBrushes;
         private Point? _lastMousePoint;
 
@@ -23,7 +22,6 @@ namespace GameOfLife.Views
             DependencyProperty.Register("Grid", typeof(GridBase), typeof(GridCanvas),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnGridOrSizeChanged));
 
-        /// <summary> Instancja siatki (modelu) powiązana z płótnem. </summary>
         public GridBase Grid
         {
             get => (GridBase)GetValue(GridProperty);
@@ -34,7 +32,6 @@ namespace GameOfLife.Views
             DependencyProperty.Register("RefreshCounter", typeof(long), typeof(GridCanvas),
                 new FrameworkPropertyMetadata(0L, FrameworkPropertyMetadataOptions.AffectsRender, OnCellsChanged));
 
-        /// <summary> Licznik zmian wymuszający ponowne przerysowanie warstwy komórek. </summary>
         public long RefreshCounter
         {
             get => (long)GetValue(RefreshCounterProperty);
@@ -45,7 +42,6 @@ namespace GameOfLife.Views
             DependencyProperty.Register("CellSize", typeof(double), typeof(GridCanvas),
                 new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnGridOrSizeChanged));
 
-        /// <summary> Rozmiar pojedynczej komórki w pikselach (skorelowany z Zoomem). </summary>
         public double CellSize
         {
             get => (double)GetValue(CellSizeProperty);
@@ -56,7 +52,6 @@ namespace GameOfLife.Views
             DependencyProperty.Register("UseCircles", typeof(bool), typeof(GridCanvas),
                 new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender, OnCellsChanged));
 
-        /// <summary> Określa, czy rysować komórki jako elipsy. </summary>
         public bool UseCircles
         {
             get => (bool)GetValue(UseCirclesProperty);
@@ -101,7 +96,7 @@ namespace GameOfLife.Views
         protected override int VisualChildrenCount => _visuals.Count;
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
-        /// <summary> Oblicza faktyczny rozmiar wizualny płótna w zależności od topologii i liczby komórek. </summary>
+        /// <summary> Obliczanie rozmiaru mapy </summary>
         protected override Size MeasureOverride(Size availableSize)
         {
             if (Grid == null) return new Size(0, 0);
@@ -123,7 +118,6 @@ namespace GameOfLife.Views
             return new Size(Grid.Width * CellSize, Grid.Height * CellSize);
         }
 
-        /// <summary> Rysuje białe tło i jasnoszarą siatkę pomocniczą na warstwie tła. </summary>
         private void RenderBackground()
         {
             if (Grid == null) return;
@@ -160,7 +154,6 @@ namespace GameOfLife.Views
             }
         }
 
-        /// <summary> Rysuje tylko żywe komórki na osobnej warstwie wizualnej. </summary>
         private void RenderCells()
         {
             if (Grid == null) return;
@@ -201,7 +194,7 @@ namespace GameOfLife.Views
             return new Point(x * CellSize, y * CellSize);
         }
 
-        private void DrawHexagon(DrawingContext dc, Point p, Brush brush, Pen pen = null)
+        private void DrawHexagon(DrawingContext dc, Point p, Brush? brush, Pen? pen = null)
         {
             var points = new Point[6];
             for (int i = 0; i < 6; i++)
@@ -214,7 +207,7 @@ namespace GameOfLife.Views
             dc.DrawGeometry(brush, pen, sg);
         }
 
-        private void DrawTriangle(DrawingContext dc, Point p, int x, int y, Brush brush, Pen pen = null)
+        private void DrawTriangle(DrawingContext dc, Point p, int x, int y, Brush? brush, Pen? pen = null)
         {
             bool isUpright = (x + y) % 2 == 0;
             var points = new Point[3];
@@ -241,7 +234,7 @@ namespace GameOfLife.Views
             if (IsMouseCaptured && _lastMousePoint.HasValue)
             {
                 Point currentPoint = e.GetPosition(this);
-                // Interpolacja linii, aby uniknąć dziur przy szybkim ruchu myszą
+                // Interpolacja linii
                 double dist = Math.Sqrt(Math.Pow(currentPoint.X - _lastMousePoint.Value.X, 2) + Math.Pow(currentPoint.Y - _lastMousePoint.Value.Y, 2));
                 int steps = (int)(dist / (CellSize / 2)) + 1;
                 for (int i = 0; i <= steps; i++)
@@ -255,9 +248,7 @@ namespace GameOfLife.Views
 
         private void OnMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e) { ReleaseMouseCapture(); _lastMousePoint = null; }
 
-        /// <summary>
-        /// Wyznacza współrzędne komórki na podstawie punktu kliknięcia i aktualizuje jej stan.
-        /// </summary>
+        /// Wyznacza współrzędne komórki tam gdzie klikamy do rysowania
         private void HandleMouse(Point p)
         {
             if (DataContext is MainViewModel vm && Grid != null)

@@ -92,19 +92,6 @@
                     <TextBox Text="{Binding RuleString, UpdateSourceTrigger=PropertyChanged}"/>
                 </GroupBox>
 
-                <GroupBox Header="Przykładowe wzorce" Margin="5">
-                    <StackPanel>
-                        <ComboBox x:Name="PatternCombo" SelectedIndex="0">
-                            <ComboBoxItem Content="Wybierz wzorzec..."/>
-                            <ComboBoxItem Content="Szybowiec (Glider)"/>
-                            <ComboBoxItem Content="Działo (Gosper Glider Gun)"/>
-                            <ComboBoxItem Content="Pulsar"/>
-                            <ComboBoxItem Content="Blok (Niezmienny)"/>
-                        </ComboBox>
-                        <Button Content="Wstaw wzorzec" Margin="0,5,0,0" Command="{Binding LoadPatternCommand}" CommandParameter="{Binding SelectedItem.Content, ElementName=PatternCombo}"/>
-                    </StackPanel>
-                </GroupBox>
-
                 <GroupBox Header="Statystyki" Margin="5">
                     <StackPanel>
                         <TextBlock Text="{Binding Stats.Generations, StringFormat='Pokolenia: {0}', NotifyOnTargetUpdated=True}">

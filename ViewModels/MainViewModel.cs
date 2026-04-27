@@ -1,12 +1,14 @@
-using GameOfLife.Models;
-using Microsoft.Win32;
-using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using GameOfLife.Models;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 
 namespace GameOfLife.ViewModels
 {
@@ -181,7 +183,6 @@ namespace GameOfLife.ViewModels
             LoadCommand = new RelayCommand(_ => LoadFromFile());
             ExportImageCommand = new RelayCommand(ExportImage);
             NewBoardCommand = new RelayCommand(_ => CreateNewBoard());
-            LoadPatternCommand = new RelayCommand(p => LoadPattern(p?.ToString()));
         }
 
         /// <summary> Zdarzenie żądania eksportu obrazu, obsługiwane w code-behind MainWindow. </summary>
@@ -212,57 +213,10 @@ namespace GameOfLife.ViewModels
                 _ => new SquareGrid(BoardWidth, BoardHeight)
             };
             Grid.Coloring = _selectedColoring;
-            Grid.SetRules(RuleString);
-            RefreshCounter++;
-            OnPropertyChanged(nameof(Stats));
-        }
-
-        /// <summary> Wstawia predefiniowany wzorzec w centrum planszy. </summary>
-        private void LoadPattern(string? patternName)
-        {
-            if (string.IsNullOrEmpty(patternName) || patternName == "Wybierz wzorzec...") return;
-
-            int midX = Grid.Width / 2;
-            int midY = Grid.Height / 2;
-
-            if (patternName == "Szybowiec (Glider)")
-            {
-                Grid.SetCell(midX, midY - 1, 1);
-                Grid.SetCell(midX + 1, midY, 1);
-                Grid.SetCell(midX - 1, midY + 1, 1);
-                Grid.SetCell(midX, midY + 1, 1);
-                Grid.SetCell(midX + 1, midY + 1, 1);
-            }
-            else if (patternName == "Działo (Gosper Glider Gun)")
-            {
-                int[][] gun = new int[][] {
-                    new int[] {25, 1}, new int[] {23, 2}, new int[] {25, 2}, new int[] {13, 3}, new int[] {14, 3}, new int[] {21, 3}, new int[] {22, 3}, new int[] {35, 3}, new int[] {36, 3},
-                    new int[] {12, 4}, new int[] {16, 4}, new int[] {21, 4}, new int[] {22, 4}, new int[] {35, 4}, new int[] {36, 4}, new int[] {1, 5}, new int[] {2, 5}, new int[] {11, 5},
-                    new int[] {17, 5}, new int[] {21, 5}, new int[] {22, 5}, new int[] {1, 6}, new int[] {2, 6}, new int[] {11, 6}, new int[] {15, 6}, new int[] {17, 6}, new int[] {18, 6},
-                    new int[] {23, 6}, new int[] {25, 6}, new int[] {11, 7}, new int[] {17, 7}, new int[] {25, 7}, new int[] {12, 8}, new int[] {16, 8}, new int[] {13, 9}, new int[] {14, 9}
-                };
-                foreach (var p in gun) Grid.SetCell(p[0], p[1], 1);
-            }
-            else if (patternName == "Pulsar")
-            {
-                int[] offsets = { -4, -3, -2, 2, 3, 4 };
-                foreach (int i in offsets) {
-                    foreach (int j in new[] { -1, 1 }) {
-                        Grid.SetCell(midX + i, midY + j * 6, 1);
-                        Grid.SetCell(midX + j * 6, midY + i, 1);
-                        Grid.SetCell(midX + i, midY + j * 1, 1);
-                        Grid.SetCell(midX + j * 1, midY + i, 1);
-                    }
-                }
-            }
-            else if (patternName == "Blok (Niezmienny)")
-            {
-                Grid.SetCell(midX, midY, 1);
-                Grid.SetCell(midX + 1, midY, 1);
-                Grid.SetCell(midX, midY + 1, 1);
-                Grid.SetCell(midX + 1, midY + 1, 1);
-            }
-
+            
+            // Aktualizacja GUI na podstawie domyślnych reguł nowej topologii
+            RuleString = Grid.DefaultRules;
+            
             RefreshCounter++;
             OnPropertyChanged(nameof(Stats));
         }
@@ -290,17 +244,19 @@ namespace GameOfLife.ViewModels
             if (ofd.ShowDialog() == true)
             {
                 var json = File.ReadAllText(ofd.FileName);
-                dynamic data = JsonConvert.DeserializeObject(json);
+                var data = JsonConvert.DeserializeObject<dynamic>(json);
 
-                BoardWidth = data.Width;
-                BoardHeight = data.Height;
-                RuleString = data.Rules;
-                SelectedTopology = (Topology)data.Topology;
-                SelectedColoring = (ColoringModel)data.Coloring;
+                if (data == null) return;
+
+                BoardWidth = (int)data.Width;
+                BoardHeight = (int)data.Height;
+                RuleString = (string)data.Rules;
+                SelectedTopology = (Topology)(int)data.Topology;
+                SelectedColoring = (ColoringModel)(int)data.Coloring;
 
                 CreateNewBoard();
-                int[] cells = data.Cells.ToObject<int[]>();
-                Array.Copy(cells, Grid.Cells, cells.Length);
+                int[] cells = ((Newtonsoft.Json.Linq.JArray)data.Cells).ToObject<int[]>() ?? Array.Empty<int>();
+                Array.Copy(cells, Grid.Cells, Math.Min(cells.Length, Grid.Cells.Length));
                 RefreshCounter++;
                 OnPropertyChanged(nameof(Stats));
             }

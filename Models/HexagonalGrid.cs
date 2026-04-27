@@ -4,9 +4,10 @@ namespace GameOfLife.Models
 {
     public class HexagonalGrid : GridBase
     {
+        public override string DefaultRules => "B2/S34";
+
         public HexagonalGrid(int width, int height) : base(width, height)
         {
-            SetRules("B2/S34"); // Common hex life rule
         }
 
         public override void Step()

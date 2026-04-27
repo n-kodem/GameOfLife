@@ -4,6 +4,8 @@ namespace GameOfLife.Models
 {
     public class SquareGrid : GridBase
     {
+        public override string DefaultRules => "B3/S23";
+
         public SquareGrid(int width, int height) : base(width, height) { }
 
         public override void Step()
@@ -74,7 +76,7 @@ namespace GameOfLife.Models
                     int nx = x + dx;
                     int ny = y + dy;
 
-                    // Wrapping or Border? Let's do Wrapping for better "life"
+                    // wrapowanie bordera
                     if (nx < 0) nx = Width - 1;
                     if (nx >= Width) nx = 0;
                     if (ny < 0) ny = Height - 1;
@@ -89,7 +91,6 @@ namespace GameOfLife.Models
 
         protected override IEnumerable<(int x, int y)> GetNeighbors(int x, int y)
         {
-            // This is for abstract UI needs, not for performance Step
             for (int dy = -1; dy <= 1; dy++)
             {
                 for (int dx = -1; dx <= 1; dx++)

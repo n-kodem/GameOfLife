@@ -4,25 +4,24 @@ using System.Linq;
 
 namespace GameOfLife.Models
 {
-    /// <summary>
-    /// Bazowa klasa dla silnika gry w życie, obsługująca stan komórek, reguły i statystyki.
-    /// </summary>
     public abstract class GridBase
     {
         public int Width { get; protected set; }
         public int Height { get; protected set; }
-        /// <summary> Aktualny stan komórek (0 = martwa, >0 = żywa, wartość to kolor). </summary>
+
         public int[] Cells { get; protected set; }
-        /// <summary> Bufor dla następnego pokolenia komórek. </summary>
+
         public int[] NextCells { get; protected set; }
 
         protected List<int> BirthRules = new();
         protected List<int> SurvivalRules = new();
 
-        /// <summary> Obecnie wybrany model kolorowania potomstwa. </summary>
         public ColoringModel Coloring { get; set; } = ColoringModel.Standard;
-        /// <summary> Statystyki symulacji. </summary>
+
         public Statistics Stats { get; } = new();
+
+        /// <summary> Domyślne reguły dla danej topologii (np. B3/S23). </summary>
+        public abstract string DefaultRules { get; }
 
         protected GridBase(int width, int height)
         {
@@ -30,11 +29,11 @@ namespace GameOfLife.Models
             Height = height;
             Cells = new int[width * height];
             NextCells = new int[width * height];
-            SetRules("B3/S23");
+            SetRules(DefaultRules);
         }
 
         /// <summary>
-        /// Parsuje ciąg tekstowy reguł (np. "B3/S23") i aktualizuje logikę narodzin/przeżycia.
+        /// Parsuje ciąg tekstowy reguł (np. "B3/S23") i aktualizuje logikę
         /// </summary>
         public void SetRules(string ruleString)
         {
@@ -58,7 +57,6 @@ namespace GameOfLife.Models
             }
         }
 
-        /// <summary> Resetuje stan planszy i statystyki. </summary>
         public void Clear()
         {
             Array.Clear(Cells, 0, Cells.Length);
@@ -68,7 +66,6 @@ namespace GameOfLife.Models
             Stats.AliveCount = 0;
         }
 
-        /// <summary> Losuje stan początkowy planszy zadaną gęstością. </summary>
         public void Randomize(double density = 0.2, int maxColors = 1)
         {
             Random rand = new();
@@ -84,7 +81,6 @@ namespace GameOfLife.Models
             Stats.AliveCount = Cells.Count(c => c > 0);
         }
 
-        /// <summary> Wykonuje jeden krok symulacji (oblicza nowe pokolenie). </summary>
         public abstract void Step();
 
         protected int GetCell(int x, int y)
@@ -96,8 +92,8 @@ namespace GameOfLife.Models
         protected abstract IEnumerable<(int x, int y)> GetNeighbors(int x, int y);
 
         /// <summary>
-        /// Wyznacza kolor nowo narodzonej komórki na podstawie kolorów jej sąsiadów i wybranego modelu.
-        /// </summary>
+        /// Wyznacza kolory komórek
+        ///
         protected int DetermineNewColor(List<int> neighborColors)
         {
             if (neighborColors.Count == 0) return 1;
@@ -105,7 +101,7 @@ namespace GameOfLife.Models
 
             if (Coloring == ColoringModel.Immigration)
             {
-                // Immigration: dziecko otrzymuje kolor większości rodziców
+                // dziecko otrzymuje kolor większości rodziców
                 return neighborColors.GroupBy(c => c)
                                      .OrderByDescending(g => g.Count())
                                      .First().Key;
@@ -113,7 +109,7 @@ namespace GameOfLife.Models
 
             if (Coloring == ColoringModel.QuadLife)
             {
-                // QuadLife: zasady mieszania 4 kolorów
+                // zasady mieszania 4 kolorów
                 var groups = neighborColors.GroupBy(c => c).ToList();
                 if (groups.Count == 3) // 3 rodziców, każdy inny kolor
                 {
@@ -127,7 +123,7 @@ namespace GameOfLife.Models
             return 1;
         }
 
-        /// <summary> Przełącza stan komórki (żywa/martwa) w danym punkcie. </summary>
+        /// <summary> Przełącza stan komórki </summary>
         public void ToggleCell(int x, int y, int color = 1)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height) return;
@@ -136,7 +132,7 @@ namespace GameOfLife.Models
             UpdateAliveCount();
         }
 
-        /// <summary> Ustawia konkretny kolor komórki. </summary>
+        /// <summary> Ustawia kolor komórki </summary>
         public void SetCell(int x, int y, int color)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height) return;
