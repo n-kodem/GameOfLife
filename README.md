@@ -1,51 +1,113 @@
-# Game of Life - WPF Edition
+# Sprawozdanie z laboratorium:
 
-Zaawansowana aplikacja zrealizowana w technologii WPF, implementująca automat komórkowy "Gra w życie" (Conway's Game of Life) z obsługą wielu topologii, modeli kolorowania oraz optymalizacją dla dużych plansz.
+## „Gra w Życie” w środowisku WPF
 
-## 🚀 Główne Funkcje
-
--   **Wsparcie dla wielu topologii:**
-    -   Siatka kwadratowa (8 sąsiadów - Moore neighborhood).
-    -   Siatka sześciokątna (6 sąsiadów).
-    -   Siatka trójkątna (12 sąsiadów).
--   **Modele kolorowania (Inheritance Models):**
-    -   **Standard:** Klasyczna, jednokolorowa symulacja.
-    -   **Immigration:** Dwa kolory; nowa komórka przyjmuje kolor większości z trzech rodziców.
-    -   **QuadLife:** Cztery kolory; specyficzne zasady mieszania barw przy narodzinach.
--   **Interaktywny interfejs:**
-    -   Płynne rysowanie myszą z interpolacją (brak przerw przy szybkich ruchach).
-    -   Wielopoziomowy zoom i panowanie (przesuwanie widoku).
-    -   Możliwość zmiany kształtu komórek (wypełnione kształty lub kółka).
--   **Zarządzanie symulacją:**
-    -   Konfigurowalne reguły w formacie `B/S` (np. domyślne `B3/S23`).
-    -   Regulacja prędkości symulacji w czasie rzeczywistym.
-    -   Zapis i odczyt stanu planszy do plików JSON.
-    -   Eksport aktualnego widoku planszy do formatu PNG.
--   **Przykładowe wzorce:** Szybkie wstawianie gotowych struktur (Szybowiec, Gosper Glider Gun, Pulsar).
-
-## 🛠 Technologia i Architektura
-
-Aplikacja została zaprojektowana zgodnie z najlepszymi praktykami programowania w C# i WPF:
-
--   **MVVM (Model-View-ViewModel):** Pełna separacja logiki biznesowej od warstwy prezentacji.
--   **Wysoka Wydajność:** Wykorzystanie `DrawingVisual` zamiast ciężkich obiektów `Shape`, co pozwala na płynną obsługę siatek przekraczających 1000x1000 komórek.
--   **Dwuwarstwowy Rendering:** Oddzielenie warstwy statycznej siatki od dynamicznej warstwy żywych komórek w celu minimalizacji narzutu procesora.
--   **WPF Concepts:** Wykorzystanie stylów, szablonów, wyzwalaczy (triggers), animacji Storyboard oraz konwerterów (MultiBinding).
-
-## 📖 Instrukcja Obsługi
-
-1.  **Start/Pauza:** Użyj przycisków na górnym pasku, aby kontrolować bieg czasu.
-2.  **Rysowanie:** Kliknij i przeciągnij lewym przyciskiem myszy na planszy, aby ożywić komórki. Symulacja pauzuje się automatycznie podczas rysowania.
-3.  **Ustawienia:** W panelu bocznym możesz zmienić wymiary planszy (wymaga kliknięcia "Stwórz nową planszę" lub zmiany topologii).
-4.  **Zoom:** Użyj suwaka lub kółka myszy (jeśli zaimplementowano), aby przybliżyć widok.
-5.  **Reguły:** Możesz eksperymentować z regułami, np. dla siatki Hex polecane jest `B2/S34`.
-
-## 📂 Struktura Projektu
-
--   `Models/`: Silnik logiczny gry, definicje siatek i zasady sąsiedztwa.
--   `ViewModels/`: Logika aplikacji i powiązania z UI.
--   `Views/`: Dedykowane kontrolki renderujące (`GridCanvas`).
--   `Helpers/`: Konwertery i klasy pomocnicze.
+**Wykonawca:** Nikodem Reszka
+**Środowisko wykonawcze:** Linux, .NET (WPF przez VM )
 
 ---
-Projekt zrealizowany w ramach laboratorium programowania wizualnego.
+
+## Uwaga wstępna
+
+Zadanie polegało na implementacji automatu komórkowego „Gra w Życie” Conwaya. Projekt został zrealizowany w technologii WPF z wykorzystaniem języka C#. Aplikacja rozszerza klasyczny model o dodatkowe topologie siatki oraz mechanizmy kolorowania komórek, co pozwala na bardziej zaawansowane eksperymenty symulacyjne.
+
+---
+
+## 1. Wybór technologii i architektura
+
+Aplikacja została zaprojektowana zgodnie ze wzorcem **MVVM (Model-View-ViewModel)**, co pozwoliło na pełne oddzielenie logiki symulacji od warstwy interfejsu użytkownika.
+
+Projekt wykorzystuje:
+
+* XAML do definicji interfejsu
+* Bindingi i konwertery do komunikacji między warstwami
+* Style, szablony oraz animacje Storyboard
+
+Struktura projektu obejmuje:
+
+* `Models/` – logika gry i definicje siatek
+* `ViewModels/` – logika aplikacji i sterowanie UI
+* `Views/` – komponenty wizualne (np. `GridCanvas`)
+* `Helpers/` – klasy pomocnicze i konwertery
+
+---
+
+## 2. Optymalizacja wydajności
+
+W celu optymalizacji:
+
+* zastosowano `DrawingVisual` zamiast ciężkich elementów UI
+* wprowadzono **dwuwarstwowy rendering**:
+
+  * warstwa statyczna (siatka)
+  * warstwa dynamiczna (żywe komórki)
+
+Dzięki temu aplikacja obsługuje płynnie siatki przekraczające rozmiar 1000×1000 komórek.
+
+---
+
+## 3. Implementacja funkcjonalności
+
+Zaimplementowano następujące elementy:
+
+### Topologie siatki
+
+* siatka kwadratowa
+* siatka sześciokątna
+* siatka trójkątna
+
+### Modele kolorowania (Inheritance Models)
+
+* Standard – jednokolorowa symulacja
+* Immigration – dwa kolory, dziedziczenie większości
+* QuadLife – cztery kolory i rozszerzone zasady mieszania
+
+### Panel sterowania
+
+* start / pauza symulacji
+* regulacja prędkości w czasie rzeczywistym
+* pojedynczy krok symulacji
+
+### Interakcja użytkownika
+
+* rysowanie myszą z interpolacją
+* automatyczna pauza podczas edycji
+* zoom oraz przesuwanie widoku (pan)
+
+### Reguły symulacji
+
+* konfigurowalne reguły w formacie `B/S` (np. `B3/S23`)
+* możliwość eksperymentowania z różnymi zestawami reguł
+
+---
+
+## 4. Zoom i personalizacja widoku
+
+Zaimplementowano mechanizm powiększenia oraz dostosowania wyglądu:
+
+* płynny zoom (suwak / scroll)
+* możliwość zmiany kształtu komórek (kwadraty / koła)
+* eksport widoku do pliku PNG
+
+---
+
+## 5. Obsługa danych i stan aplikacji
+
+Aplikacja umożliwia:
+
+* zapis stanu planszy do pliku JSON
+* odczyt zapisanych konfiguracji
+
+Dzięki separacji logiki (MVVM) zarządzanie stanem aplikacji jest niezależne od warstwy wizualnej.
+
+---
+
+## Wykorzystane pojęcia i technologie
+
+* **WPF (Windows Presentation Foundation)** – framework do tworzenia aplikacji desktopowych
+* **MVVM** – wzorzec projektowy oddzielający logikę od UI
+* **DrawingVisual** – wydajny mechanizm renderowania grafiki
+* **Binding / MultiBinding** – mechanizmy wiązania danych
+* **Storyboard** – system animacji w WPF
+
+
