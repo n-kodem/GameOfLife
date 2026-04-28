@@ -1,6 +1,6 @@
 # Sprawozdanie z laboratorium:
 
-## „Gra w Życie” w środowisku WPF
+## "Gra w Życie" w środowisku WPF
 
 **Wykonawca:** Nikodem Reszka
 
