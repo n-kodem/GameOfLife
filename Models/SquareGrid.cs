@@ -53,7 +53,6 @@ namespace GameOfLife.Models
                 }
             }
 
-            // Swap buffers
             var temp = Cells;
             Cells = NextCells;
             NextCells = temp;

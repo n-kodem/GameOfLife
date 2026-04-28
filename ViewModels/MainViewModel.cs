@@ -12,9 +12,6 @@ using Newtonsoft.Json;
 
 namespace GameOfLife.ViewModels
 {
-    /// <summary>
-    /// Główny ViewModel aplikacji, zarządzający stanem symulacji, komendami i interakcją z widokiem.
-    /// </summary>
     public class MainViewModel : ViewModelBase
     {
         private GridBase _grid;
@@ -30,21 +27,18 @@ namespace GameOfLife.ViewModels
         private bool _useCircles = false;
         private long _refreshCounter = 0;
 
-        /// <summary> Obiekt siatki przechowujący stan komórek. </summary>
         public GridBase Grid
         {
             get => _grid;
             set => SetProperty(ref _grid, value);
         }
 
-        /// <summary> Licznik wymuszający odświeżenie widoku (GridCanvas). </summary>
         public long RefreshCounter
         {
             get => _refreshCounter;
             set => SetProperty(ref _refreshCounter, value);
         }
 
-        /// <summary> Określa, czy animacja jest w toku. </summary>
         public bool IsRunning
         {
             get => _isRunning;
@@ -58,7 +52,6 @@ namespace GameOfLife.ViewModels
             }
         }
 
-        /// <summary> Opóźnienie między krokami animacji w milisekundach. </summary>
         public int Delay
         {
             get => _delay;
@@ -83,7 +76,6 @@ namespace GameOfLife.ViewModels
             set => SetProperty(ref _boardHeight, value);
         }
 
-        /// <summary> Ciąg znaków definiujący reguły (np. B3/S23). </summary>
         public string RuleString
         {
             get => _ruleString;
@@ -96,21 +88,18 @@ namespace GameOfLife.ViewModels
             }
         }
 
-        /// <summary> Poziom powiększenia planszy. </summary>
         public double Zoom
         {
             get => _zoom;
             set => SetProperty(ref _zoom, value);
         }
 
-        /// <summary> Czy rysować komórki jako koła (zamiast domyślnych kształtów topologii). </summary>
         public bool UseCircles
         {
             get => _useCircles;
             set => SetProperty(ref _useCircles, value);
         }
 
-        /// <summary> Wybrana topologia siatki. </summary>
         public Topology SelectedTopology
         {
             get => _selectedTopology;
@@ -123,7 +112,6 @@ namespace GameOfLife.ViewModels
             }
         }
 
-        /// <summary> Wybrany model kolorowania. </summary>
         public ColoringModel SelectedColoring
         {
             get => _selectedColoring;
@@ -143,7 +131,6 @@ namespace GameOfLife.ViewModels
         public ObservableCollection<Topology> Topologies { get; } = new(Enum.GetValues<Topology>().Cast<Topology>());
         public ObservableCollection<ColoringModel> ColoringModels { get; } = new(Enum.GetValues<ColoringModel>().Cast<ColoringModel>());
 
-        /// <summary> Statystyki udostępniane dla widoku. </summary>
         public Statistics Stats => Grid.Stats;
 
         // Komendy UI
@@ -185,7 +172,6 @@ namespace GameOfLife.ViewModels
             NewBoardCommand = new RelayCommand(_ => CreateNewBoard());
         }
 
-        /// <summary> Zdarzenie żądania eksportu obrazu, obsługiwane w code-behind MainWindow. </summary>
         public event Action? RequestExportImage;
 
         private void ExportImage(object? obj)
@@ -193,7 +179,6 @@ namespace GameOfLife.ViewModels
             RequestExportImage?.Invoke();
         }
 
-        /// <summary> Wykonuje krok symulacji i odświeża statystyki/widok. </summary>
         private void Step()
         {
             Grid.Step();
@@ -201,7 +186,6 @@ namespace GameOfLife.ViewModels
             OnPropertyChanged(nameof(Stats));
         }
 
-        /// <summary> Tworzy nową instancję siatki na podstawie wybranych ustawień. </summary>
         private void CreateNewBoard()
         {
             IsRunning = false;
@@ -214,7 +198,6 @@ namespace GameOfLife.ViewModels
             };
             Grid.Coloring = _selectedColoring;
             
-            // Aktualizacja GUI na podstawie domyślnych reguł nowej topologii
             RuleString = Grid.DefaultRules;
             
             RefreshCounter++;

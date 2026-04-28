@@ -20,7 +20,6 @@ namespace GameOfLife.Models
 
         public Statistics Stats { get; } = new();
 
-        /// <summary> Domyślne reguły dla danej topologii (np. B3/S23). </summary>
         public abstract string DefaultRules { get; }
 
         protected GridBase(int width, int height)
@@ -32,12 +31,9 @@ namespace GameOfLife.Models
             SetRules(DefaultRules);
         }
 
-        /// <summary>
-        /// Parsuje ciąg tekstowy reguł (np. "B3/S23") i aktualizuje logikę
-        /// </summary>
+
         public void SetRules(string ruleString)
         {
-            // Format: B3/S23
             BirthRules.Clear();
             SurvivalRules.Clear();
 
@@ -91,9 +87,7 @@ namespace GameOfLife.Models
 
         protected abstract IEnumerable<(int x, int y)> GetNeighbors(int x, int y);
 
-        /// <summary>
-        /// Wyznacza kolory komórek
-        ///
+
         protected int DetermineNewColor(List<int> neighborColors)
         {
             if (neighborColors.Count == 0) return 1;
@@ -101,7 +95,6 @@ namespace GameOfLife.Models
 
             if (Coloring == ColoringModel.Immigration)
             {
-                // dziecko otrzymuje kolor większości rodziców
                 return neighborColors.GroupBy(c => c)
                                      .OrderByDescending(g => g.Count())
                                      .First().Key;
@@ -109,13 +102,12 @@ namespace GameOfLife.Models
 
             if (Coloring == ColoringModel.QuadLife)
             {
-                // zasady mieszania 4 kolorów
                 var groups = neighborColors.GroupBy(c => c).ToList();
-                if (groups.Count == 3) // 3 rodziców, każdy inny kolor
+                if (groups.Count == 3) 
                 {
                     var allColors = new HashSet<int> { 1, 2, 3, 4 };
                     foreach (var g in groups) allColors.Remove(g.Key);
-                    return allColors.FirstOrDefault(); // 4. kolor
+                    return allColors.FirstOrDefault();
                 }
                 return groups.OrderByDescending(g => g.Count()).First().Key;
             }
@@ -123,7 +115,6 @@ namespace GameOfLife.Models
             return 1;
         }
 
-        /// <summary> Przełącza stan komórki </summary>
         public void ToggleCell(int x, int y, int color = 1)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height) return;
@@ -132,7 +123,6 @@ namespace GameOfLife.Models
             UpdateAliveCount();
         }
 
-        /// <summary> Ustawia kolor komórki </summary>
         public void SetCell(int x, int y, int color)
         {
             if (x < 0 || x >= Width || y < 0 || y >= Height) return;

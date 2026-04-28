@@ -69,8 +69,7 @@ namespace GameOfLife.Models
         {
             var colors = new List<int>(6);
 
-            // Offset coordinates (shoveled rows)
-            // Even rows are shifted right
+
             int[][] neighbors;
             if (y % 2 == 0)
             {

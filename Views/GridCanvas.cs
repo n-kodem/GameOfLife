@@ -7,9 +7,7 @@ using GameOfLife.ViewModels;
 
 namespace GameOfLife.Views
 {
-    /// <summary>
-    /// Renderowanie symulacji
-    /// </summary>
+
     public class GridCanvas : FrameworkElement
     {
         private readonly VisualCollection _visuals;
