@@ -10,7 +10,7 @@
 
 ## Uwaga wstępna
 
-Zadanie polegało na implementacji automatu komórkowego „Gra w Życie” Conwaya. Projekt został zrealizowany w technologii WPF z wykorzystaniem języka C#. Aplikacja rozszerza klasyczny model o dodatkowe topologie siatki oraz mechanizmy kolorowania komórek, co pozwala na bardziej zaawansowane eksperymenty symulacyjne.
+Zadanie polegało na implementacji automatu komórkowego "Gra w Życie" Conwaya. Projekt został zrealizowany w technologii WPF z wykorzystaniem języka C#. Aplikacja rozszerza klasyczny model o dodatkowe topologie siatki oraz mechanizmy kolorowania komórek, co pozwala na bardziej zaawansowane eksperymenty symulacyjne.
 
 ---
 
