@@ -3,6 +3,7 @@
 ## „Gra w Życie” w środowisku WPF
 
 **Wykonawca:** Nikodem Reszka
+
 **Środowisko wykonawcze:** Linux, .NET (WPF przez VM )
 
 ---
